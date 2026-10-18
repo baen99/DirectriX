@@ -18,12 +18,7 @@ public class Main {
 
         }
 
-        try {
-            System.out.println(Cache.addChildrenToMapRecursively(Path.of(Cache.TEST_ROOT_DIRECTORY)));
-        }
-        catch (IOException e) {
-            
-        }
+        System.out.println(Cache.addChildrenToMapRecursively(Path.of(Cache.TEST_ROOT_DIRECTORY)));
         
 
         /*try {

@@ -31,52 +31,59 @@ public class Cache {
         }
     }
 
-    public static void addChildrenToMap(Path dir) throws IOException {   
-        Files.list(dir)
-            .filter(Files::isDirectory)
-            //.map(Path::getFileName)
-            //.map(Path::toString)
-            .forEach(subdir -> {
-                String subdirName = subdir.getFileName().toString(); 
-                List<String> pathsToSubdir = cache.getOrDefault(subdirName, new ArrayList<>());
-                pathsToSubdir.add(subdir.toString());
-                cache.put(subdirName,pathsToSubdir);
-            });  
-    }
+    
 
-    public static Map<String, List<String>> addChildrenToMapRecursively(Path dir) throws IOException {
-        try (Stream<Path> children = Files.list(dir).filter(Files::isDirectory)) {
+    /**
+     * Mappt rekursiv jeden Unterordner (auch nested) von dir auf seinen Pfad. Geht die komplette Baumstruktur
+     * entlang, bis kein Unterordner mehr vorhanden ist.
+     * @param dir Ordner, von dem aus alle Unterordner aufgelistet werden.
+     * @return Map mit Ordnernamen und deren absoluten Pfaden.
+     */
+    public static Map<String, List<String>> addChildrenToMapRecursively(Path dir) {
+        try (Stream<Path> children = Files.list(dir)) {
+
+            List<Path> childrenList = children.filter(Files::isDirectory).toList();
+
+            MapEntry currentDirAsEntry = new MapEntry( dir.getFileName().toString(), new ArrayList<>( List.of( dir.toString() ) ) );
             
             // Abbruchbedingung
-            if (children.findAny().isEmpty()) { // lookup consumes stream
-                return Map.of(dir.getFileName().toString(), new ArrayList<String>(List.of(dir.toString())));
+            if (childrenList.isEmpty()) { 
+                return Map.of(currentDirAsEntry.key(), currentDirAsEntry.value() );
             }
 
-            Stream<Path> childrenReopenedStream = Files.list(dir).filter(Files::isDirectory);
-            Map<String, List<String>> m = new HashMap<>();
-            m.put(dir.getFileName().toString(), List.of(dir.toString()));
-            childrenReopenedStream
+            Map<String, List<String>> directoryMap = new HashMap<>();
+            directoryMap.put(currentDirAsEntry.key(), currentDirAsEntry.value());
+            childrenList
                 .forEach(subdir -> {
-                    try {
-                        Map<String, List<String>> childrenMap = addChildrenToMapRecursively(subdir); // Rekursionsschritt
-                            
-                        childrenMap
-                            .entrySet()
-                            .forEach(entry -> {
-                                String subdirName = entry.getKey();
-                                List<String> pathsToSubdir = m.getOrDefault(subdirName , new ArrayList<>());
-                                pathsToSubdir.addAll(entry.getValue());
-                                m.put(subdirName, pathsToSubdir);
-                            });
-
-                    }
-                    catch (IOException e) { System.err.println(e.getMessage()); }
-                    
+                    Map<String, List<String>> childrenMap = addChildrenToMapRecursively(subdir); // Rekursionsschritt
+                    addChildrenToCurrentDirectoryMap(directoryMap, childrenMap);
                 });
             
-            return m;
+            return directoryMap;
+        }
+        catch (IOException e) { 
+            System.err.println(e.getMessage()); 
+            return null;
         }
            
+    }
+
+
+
+    /**
+     * Fügt eine Liste von Unterordnern mit deren Pfaden der bestehenden Gesamtmap hinzu.
+     * @param directoryMap
+     * @param childrenMap
+     */
+    private static void addChildrenToCurrentDirectoryMap(Map<String, List<String>> directoryMap, Map<String, List<String>> childrenMap) {
+        childrenMap
+            .entrySet()
+            .forEach(entry -> {
+                String subdirName = entry.getKey();
+                List<String> pathsToSubdir = directoryMap.getOrDefault(subdirName , new ArrayList<>());
+                pathsToSubdir.addAll(entry.getValue());
+                directoryMap.put(subdirName, pathsToSubdir);
+            });
     }
     
 
@@ -88,6 +95,10 @@ public class Cache {
     public static void updateCache() {
 
     }
+
+
+    record MapEntry(String key, List<String> value) {}
+
 
 
     /**
@@ -123,6 +134,20 @@ public class Cache {
         }
         
         
+    }
+
+    @Deprecated 
+    private static void addChildrenToMap(Path dir) throws IOException {   
+        Files.list(dir)
+            .filter(Files::isDirectory)
+            //.map(Path::getFileName)
+            //.map(Path::toString)
+            .forEach(subdir -> {
+                String subdirName = subdir.getFileName().toString(); 
+                List<String> pathsToSubdir = cache.getOrDefault(subdirName, new ArrayList<>());
+                pathsToSubdir.add(subdir.toString());
+                cache.put(subdirName,pathsToSubdir);
+            });  
     }
 
 }
