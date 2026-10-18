@@ -15,6 +15,13 @@ public class Main {
             System.out.println(Cache.fuegeChildrenRekursivListeHinzu(Path.of(Cache.TEST_ROOT_DIRECTORY)));
         }
         catch (IOException e) {
+
+        }
+
+        try {
+            System.out.println(Cache.addChildrenToMapRecursively(Path.of(Cache.TEST_ROOT_DIRECTORY)));
+        }
+        catch (IOException e) {
             
         }
         

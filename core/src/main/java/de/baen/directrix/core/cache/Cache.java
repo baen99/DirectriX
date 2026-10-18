@@ -44,6 +44,42 @@ public class Cache {
             });  
     }
 
+    public static Map<String, List<String>> addChildrenToMapRecursively(Path dir) throws IOException {
+        try (Stream<Path> children = Files.list(dir).filter(Files::isDirectory)) {
+            
+            // Abbruchbedingung
+            if (children.findAny().isEmpty()) { // lookup consumes stream
+                return Map.of(dir.getFileName().toString(), new ArrayList<String>(List.of(dir.toString())));
+            }
+
+            Stream<Path> childrenReopenedStream = Files.list(dir).filter(Files::isDirectory);
+            Map<String, List<String>> m = new HashMap<>();
+            m.put(dir.getFileName().toString(), List.of(dir.toString()));
+            childrenReopenedStream
+                .forEach(subdir -> {
+                    try {
+                        Map<String, List<String>> childrenMap = addChildrenToMapRecursively(subdir); // Rekursionsschritt
+                            
+                        childrenMap
+                            .entrySet()
+                            .forEach(entry -> {
+                                String subdirName = entry.getKey();
+                                List<String> pathsToSubdir = m.getOrDefault(subdirName , new ArrayList<>());
+                                pathsToSubdir.addAll(entry.getValue());
+                                m.put(subdirName, pathsToSubdir);
+                            });
+
+                    }
+                    catch (IOException e) { System.err.println(e.getMessage()); }
+                    
+                });
+            
+            return m;
+        }
+           
+    }
+    
+
 
     public static void saveCache() {
         cacheSaver.save();
