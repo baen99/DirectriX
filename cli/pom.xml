@@ -6,7 +6,7 @@
 
     <groupId>de.baen.directrix</groupId>
     <artifactId>cli</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>${revision}</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>de.baen.directrix</groupId>
             <artifactId>core</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>${revision}</version>
         </dependency>   
     </dependencies>
 
