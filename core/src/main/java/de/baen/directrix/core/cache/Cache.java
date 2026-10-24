@@ -21,6 +21,10 @@ public class Cache {
     public static final String ROOT_DIRECTORY = "C:\\";
     public static final String TEST_ROOT_DIRECTORY = "C:\\Coding Projekte\\Express cd\\Playground\\A";
 
+    public String getString() {
+        return "Yoo wtf";
+    }
+
 
     public static void loadCache() {
         cache = cacheLoader.load();
