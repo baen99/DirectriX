@@ -2,7 +2,11 @@ $version = "0.1-SNAPSHOT"
 $pathToJar = "C:\Coding Projekte\Express cd\cli\target\cli-$version.jar"
 
 function dirx {
-    $target = & java -jar $pathToJar
+    param(
+        [string]$argument = "a" # Default argument if none is provided 
+    )
+
+    $target = & java -jar $pathToJar $argument
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Java program failed."
