@@ -13,4 +13,12 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.baen.directrix</groupId>
+            <artifactId>util</artifactId>
+            <version>${revision}</version>
+        </dependency>   
+    </dependencies>
+
 </project>
