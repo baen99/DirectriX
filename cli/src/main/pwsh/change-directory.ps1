@@ -14,7 +14,7 @@ Write-Host $version
 
 function dirx {
     param(
-        [string]$argument = "a" # Default argument if none is provided 
+        [string]$argument
     )
 
     $target = & java -jar $pathToJar $argument 2>&1 # redirect stderr to stdout
@@ -24,6 +24,7 @@ function dirx {
         return
     }
 
+    # Zusätzliche Prüfung: kann sein, dass der Java-Aufruf einen veralteten Cache nutzt
     if ($target -and (Test-Path -LiteralPath $target -PathType Container)) {
         Set-Location -LiteralPath $target
     }
