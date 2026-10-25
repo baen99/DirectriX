@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.baen.directrix</groupId>
   <artifactId>cli</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>${revision}</version>
   <build>
     <plugins>
       <plugin>

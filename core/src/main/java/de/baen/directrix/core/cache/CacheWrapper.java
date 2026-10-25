@@ -13,26 +13,16 @@ import java.nio.file.Path;
  * 
  * Represents a current snapshot of the directory structure. 
  */
-public class Cache {
+public class CacheWrapper {
 
-    public static Map<String, List<String>> cache = new HashMap<>();
-    private static CacheLoader cacheLoader = new CacheLoader();
-    private static CacheSaver cacheSaver = new CacheSaver();
+    public Map<String, List<String>> cache;
+    private CacheLoader cacheLoader = new CacheLoader();
+    private CacheSaver cacheSaver = new CacheSaver();
     public static final String ROOT_DIRECTORY = "C:\\";
     public static final String TEST_ROOT_DIRECTORY = "C:\\Coding Projekte\\Express cd\\Playground\\A";
 
     public String getString() {
         return "Yoo wtf";
-    }
-
-
-    public static void loadCache() {
-        cache = cacheLoader.load();
-
-        // kein Cache vorhanden, create new one
-        if (cache == null) {
-            cache = new HashMap<>(); // TODO: befüllen
-        }
     }
 
     
@@ -43,7 +33,7 @@ public class Cache {
      * @param dir Ordner, von dem aus alle Unterordner aufgelistet werden.
      * @return Map mit Ordnernamen und deren absoluten Pfaden.
      */
-    public static Map<String, List<String>> addChildrenToMapRecursively(Path dir) {
+    public Map<String, List<String>> addChildrenToMapRecursively(Path dir) {
         try (Stream<Path> children = Files.list(dir)) {
 
             List<Path> childrenList = children.filter(Files::isDirectory).toList();
@@ -72,6 +62,34 @@ public class Cache {
            
     }
 
+    public Map<String, List<String>> loadCache() {
+        cache = cacheLoader.load();
+
+        // kein Cache vorhanden, create new one
+        if (cache == null || cache.isEmpty()) {
+            cache = new HashMap<>();
+            cache = addChildrenToMapRecursively(Path.of(TEST_ROOT_DIRECTORY));
+        }
+
+        return cache;
+    }
+
+
+    public void saveCache() {
+        cacheSaver.save();
+    }
+
+
+    public void updateCache() {
+
+    }
+
+
+    record MapEntry(String key, List<String> value) {}
+
+
+
+
 
 
     /**
@@ -79,7 +97,7 @@ public class Cache {
      * @param directoryMap
      * @param childrenMap
      */
-    private static void addChildrenToCurrentDirectoryMap(Map<String, List<String>> directoryMap, Map<String, List<String>> childrenMap) {
+    private void addChildrenToCurrentDirectoryMap(Map<String, List<String>> directoryMap, Map<String, List<String>> childrenMap) {
         childrenMap
             .entrySet()
             .forEach(entry -> {
@@ -89,19 +107,6 @@ public class Cache {
                 directoryMap.put(subdirName, pathsToSubdir);
             });
     }
-    
-
-
-    public static void saveCache() {
-        cacheSaver.save();
-    }
-
-    public static void updateCache() {
-
-    }
-
-
-    record MapEntry(String key, List<String> value) {}
 
 
 
@@ -112,7 +117,7 @@ public class Cache {
      * @throws IOException
      */
     @Deprecated 
-    public static List<String> fuegeChildrenRekursivListeHinzu(Path dir) throws IOException {
+    public List<String> fuegeChildrenRekursivListeHinzu(Path dir) throws IOException {
         try (Stream<Path> children = Files.list(dir).filter(Files::isDirectory)) {
             
             // Abbruchbedingung
@@ -134,14 +139,12 @@ public class Cache {
             
             return l;
 
-
         }
-        
-        
+            
     }
 
     @Deprecated 
-    private static void addChildrenToMap(Path dir) throws IOException {   
+    private void addChildrenToMap(Path dir) throws IOException {   
         Files.list(dir)
             .filter(Files::isDirectory)
             //.map(Path::getFileName)
