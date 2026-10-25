@@ -20,6 +20,17 @@ public class CacheWrapper {
     private CacheSaver cacheSaver = new CacheSaver();
     public static final String ROOT_DIRECTORY = "C:\\";
     public static final String TEST_ROOT_DIRECTORY = "C:\\Coding Projekte\\Express cd\\Playground\\A";
+    /**
+     * Nur bestimmte, hardcodierte Ordner unter C: erlauben,
+     * da spezielle Windows-Ordner Probleme beim Scannen machen.
+     */
+    private static final Path[] ALLOWED_FOLDERS_UNDER_C = {
+        Path.of("C:\\Users"),
+        Path.of("C:\\Coding Projekte"),
+        Path.of("C:\\Program Files"),
+        Path.of("C:\\Program Files (x86)"),
+        Path.of("C:\\Python312")
+    };
 
     public String getString() {
         return "Yoo wtf";
@@ -36,9 +47,21 @@ public class CacheWrapper {
     public Map<String, List<String>> addChildrenToMapRecursively(Path dir) {
         try (Stream<Path> children = Files.list(dir)) {
 
-            List<Path> childrenList = children.filter(Files::isDirectory).toList();
+            List<Path> childrenList;
+            if (dir.equals(Path.of(ROOT_DIRECTORY))) {
+                // Sonderfall am Anfang: filtere nur bestimmte Ordner unter C: heraus
+                childrenList = List.of(ALLOWED_FOLDERS_UNDER_C);
+            } else {
+                childrenList = children
+                .filter(Files::isDirectory)
+                .filter(CacheWrapper::isVisible)
+                .toList();
+            }
+            
 
-            MapEntry currentDirAsEntry = new MapEntry( dir.getFileName().toString(), new ArrayList<>( List.of( dir.toString() ) ) );
+            Path fileName = dir.getFileName();
+            String directoryName = fileName == null ? dir.toString() : fileName.toString(); // für C: ist filename null
+            MapEntry currentDirAsEntry = new MapEntry( directoryName, new ArrayList<>( List.of( dir.toString() ) ) );
             
             // Abbruchbedingung
             if (childrenList.isEmpty()) { 
@@ -56,10 +79,34 @@ public class CacheWrapper {
             return directoryMap;
         }
         catch (IOException e) { 
-            System.err.println(e.getMessage()); 
-            return null;
+            System.err.println("Ordner " + dir + " konnte nicht gescannt werden: " + e.getMessage());
+            return Map.of();
         }
            
+    }
+
+    /**
+     * Fügt eine Liste von Unterordnern mit deren Pfaden der bestehenden Gesamtmap hinzu.
+     * @param directoryMap
+     * @param childrenMap
+     */
+    private void addChildrenToCurrentDirectoryMap(Map<String, List<String>> directoryMap, Map<String, List<String>> childrenMap) {
+        childrenMap
+            .entrySet()
+            .forEach(entry -> {
+                String subdirName = entry.getKey();
+                List<String> pathsToSubdir = directoryMap.getOrDefault(subdirName , new ArrayList<>());
+                pathsToSubdir.addAll(entry.getValue());
+                directoryMap.put(subdirName, pathsToSubdir);
+            });
+    }
+
+    private static boolean isVisible(Path dir) {
+        try {
+            return !Files.isHidden(dir);
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     public Map<String, List<String>> loadCache() {
@@ -68,7 +115,7 @@ public class CacheWrapper {
         // kein Cache vorhanden, create new one
         if (cache == null || cache.isEmpty()) {
             cache = new HashMap<>();
-            cache = addChildrenToMapRecursively(Path.of(TEST_ROOT_DIRECTORY));
+            cache = addChildrenToMapRecursively(Path.of(ROOT_DIRECTORY));
         }
 
         return cache;
@@ -88,25 +135,6 @@ public class CacheWrapper {
     record MapEntry(String key, List<String> value) {}
 
 
-
-
-
-
-    /**
-     * Fügt eine Liste von Unterordnern mit deren Pfaden der bestehenden Gesamtmap hinzu.
-     * @param directoryMap
-     * @param childrenMap
-     */
-    private void addChildrenToCurrentDirectoryMap(Map<String, List<String>> directoryMap, Map<String, List<String>> childrenMap) {
-        childrenMap
-            .entrySet()
-            .forEach(entry -> {
-                String subdirName = entry.getKey();
-                List<String> pathsToSubdir = directoryMap.getOrDefault(subdirName , new ArrayList<>());
-                pathsToSubdir.addAll(entry.getValue());
-                directoryMap.put(subdirName, pathsToSubdir);
-            });
-    }
 
 
 
