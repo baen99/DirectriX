@@ -17,10 +17,10 @@ function dirx {
         [string]$argument = "a" # Default argument if none is provided 
     )
 
-    $target = & java -jar $pathToJar $argument
+    $target = & java -jar $pathToJar $argument 2>&1 # redirect stderr to stdout
 
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "Java program failed."
+        Write-Host ($target -join [Environment]::NewLine) -ForegroundColor Red
         return
     }
 

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Class for loading the persisted {@link Cache} into memory when the program is initialized.
+ * Class for loading the persisted {@link CacheWrapper} into memory when the program is initialized.
  */
 public class CacheLoader {
 
