@@ -6,7 +6,7 @@
 - ~~Release Version 0.1~~
 - ~~Navigationslogik~~
 - ~~Exceptions~~
-- Release Version 1.0
+- ~~Release Version 1.0~~
 - Feature: Ambiguität durch zusätzlichen Parameter auflösen
 - Feature: Cache-Map als JSON persistieren
 - Release Version 2.0
