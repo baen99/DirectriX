@@ -1,6 +1,6 @@
-# Release notes
+# Release Notes
 
-## 1.0
+## DirectriX Version 1.0
 
 Overview of changes from commit `202ca41` ("Versionsanhebung auf 1.0-Snapshot") through the current release branch:
 
@@ -15,7 +15,6 @@ Overview of changes from commit `202ca41` ("Versionsanhebung auf 1.0-Snapshot") 
 
 ### Changed
 
-- Updated the project revision from `0.1-SNAPSHOT` to `1.0-SNAPSHOT`.
 - Renamed the cache implementation from `Cache` to `CacheWrapper` and wired the core module to the `util` module.
 - Core startup now loads and prints the directory cache.
 
