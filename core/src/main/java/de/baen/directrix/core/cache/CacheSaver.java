@@ -1,13 +1,23 @@
 package de.baen.directrix.core.cache;
 
+import java.nio.file.Path;
+import java.util.Map;
+
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.SerializationFeature;
+
 /**
  * 
  * Class for saving the current state of the {@link CacheWrapper} to disk when the program is being terminated.
  */
-public class CacheSaver {
+class CacheSaver<T extends Map<?,?>> {
 
-    protected void save() {
-        // TODO: implement me!
+    private static final ObjectWriter WRITER = 
+        CacheWrapper.MAPPER.writer().with(SerializationFeature.INDENT_OUTPUT);
+
+
+    void save(Path file, T cache) {
+        WRITER.writeValue(file.toFile(), cache);
     }
 
 }

@@ -1,13 +1,15 @@
 package de.baen.directrix.core.cache;
 
-import java.util.Map;
-import java.util.stream.Stream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 
@@ -15,9 +17,9 @@ import java.nio.file.Path;
  */
 public class CacheWrapper {
 
-    public Map<String, List<String>> cache;
-    private CacheLoader cacheLoader = new CacheLoader();
-    private CacheSaver cacheSaver = new CacheSaver();
+    private Map<String, List<String>> cache;
+    private CacheLoader<Map<String, List<String>>> cacheLoader = new CacheLoader<>();
+    private CacheSaver<Map<String, List<String>>> cacheSaver = new CacheSaver<>();
     public static final String ROOT_DIRECTORY = "C:\\";
     public static final String TEST_ROOT_DIRECTORY = "C:\\Coding Projekte\\Express cd\\Playground\\A";
     /**
@@ -31,10 +33,8 @@ public class CacheWrapper {
         Path.of("C:\\Program Files (x86)"),
         Path.of("C:\\Python312")
     };
-
-    public String getString() {
-        return "Yoo wtf";
-    }
+    private static final String PERSISTED_CACHE_MAP = "C:\\Coding Projekte\\Express cd\\core\\src\\main\\resources\\cache.json";
+    static final ObjectMapper MAPPER = new ObjectMapper();
 
     
 
@@ -110,11 +110,10 @@ public class CacheWrapper {
     }
 
     public Map<String, List<String>> loadCache() {
-        cache = cacheLoader.load();
+        cache = cacheLoader.load(Path.of(PERSISTED_CACHE_MAP));
 
         // kein Cache vorhanden, create new one
         if (cache == null || cache.isEmpty()) {
-            cache = new HashMap<>();
             cache = addChildrenToMapRecursively(Path.of(ROOT_DIRECTORY));
         }
 
@@ -123,7 +122,7 @@ public class CacheWrapper {
 
 
     public void saveCache() {
-        cacheSaver.save();
+        cacheSaver.save(Path.of(PERSISTED_CACHE_MAP), cache);
     }
 
 

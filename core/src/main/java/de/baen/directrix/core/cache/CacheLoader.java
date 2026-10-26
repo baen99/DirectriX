@@ -1,20 +1,26 @@
 package de.baen.directrix.core.cache;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
+
+import tools.jackson.core.type.TypeReference;
 
 /**
  * Class for loading the persisted {@link CacheWrapper} into memory when the program is initialized.
  */
-public class CacheLoader {
+class CacheLoader<T extends Map<?,?>> {
 
     /**
-     * @TODO implement me!
      * @return loaded cache, null if none found.
      */
-    protected Map<String, List<String>> load() {
-        return new HashMap<>();
+    T load(Path file) {
+        if (Files.notExists(file)) {
+            return null;
+        }
+        
+        return CacheWrapper.MAPPER.readValue(file.toFile(), new TypeReference<T>() {});
+        
     }
 
 }
