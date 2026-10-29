@@ -10,7 +10,8 @@ public class Main {
     public static void main(String[] args) {
         CacheWrapper cacheWrapper = new CacheWrapper();
         Map<String, List<String>> cache = cacheWrapper.loadCache();
-        System.out.println(cache);
+        //System.out.println(cache);
+        cacheWrapper.saveCache();
     }
 
 }

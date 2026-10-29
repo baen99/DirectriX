@@ -115,6 +115,7 @@ public class CacheWrapper {
         // kein Cache vorhanden, create new one
         if (cache == null || cache.isEmpty()) {
             cache = addChildrenToMapRecursively(Path.of(ROOT_DIRECTORY));
+            //System.out.println("Cache neu eingelesen!");
         }
 
         return cache;
