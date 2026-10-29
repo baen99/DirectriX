@@ -8,7 +8,7 @@
 - ~~Exceptions~~
 - ~~Release Version 1.0~~
 - Feature: Ambiguität durch zusätzlichen Parameter auflösen
-- Feature: Cache-Map als JSON persistieren
+- ~~Feature: Cache-Map als JSON persistieren~~
 - Release Version 2.0
 - Feature: Nearest Neighbour Parameter
 - Release Version 2.1
